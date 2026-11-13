@@ -1,4 +1,0 @@
-rootProject.name = "today-seafood-backend"
-
-include("api-service")
-include("gateway-service")
