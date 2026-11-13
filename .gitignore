@@ -1,0 +1,11 @@
+.gradle/
+.gradle-user-home/
+.idea/
+build/
+out/
+*.iml
+.env
+.env.*
+!.env.example
+.DS_Store
+

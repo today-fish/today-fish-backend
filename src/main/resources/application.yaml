@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: today-fish-backend
+  config:
+    import: file:.env[.properties]
+  profiles:
+    default: local
+  jpa:
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: false
+
+  docker:
+    compose:
+      enabled: false
+
