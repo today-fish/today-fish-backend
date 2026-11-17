@@ -24,8 +24,8 @@ public record RawApiResponse(
         // 원본 바이트가 외부에서 바뀌지 않도록 복사한다.
         body = body.clone();
 
-        if (HttpStatus.resolve(statusCode) == null) {
-            throw new IllegalArgumentException("Invalid HTTP statud code");
+        if (HttpStatus.Series.resolve(statusCode) == null) {
+            throw new IllegalArgumentException("Invalid HTTP status code" + statusCode);
         }
     }
 
