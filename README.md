@@ -26,16 +26,20 @@ Docker를 실행한 다음 저장소 루트에서 개발 DB와 앱을 시작합�
 
 ```sh
 cp .env.example .env
-# .env의 DB_USERNAME과 DB_PASSWORD를 입력
+# .env의 DB_USERNAME, DB_PASSWORD, AT_SERVICE_KEY를 입력
 docker compose up -d postgres
 ./gradlew bootRun
 ```
 
-로컬에서는 Compose와 Spring의 `local` 프로필이 같은 `.env` 파일을 읽습니다. DB는 기본적으로 `127.0.0.1:5433`에 노출됩니다. `.env`는 Git에서 제외됩니다.
+로컬에서는 Compose와 Spring의 `local` 프로필이 같은 `.env` 파일을 읽습니다. DB는 기본적으로 `127.0.0.1:5432`에 노출됩니다. `.env`는 Git에서 제외됩니다.
 
-배포 서버에서도 `.env.example`을 `.env`로 복사해 `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`를 채웁니다. 앱은 `prod` 프로필을 지정해 실행합니다. 예: `./gradlew bootRun --args='--spring.profiles.active=prod'`. 배포용 `.env`는 Git에 올리지 않습니다.
+`prod` 프로필은 `.env` 파일을 자동으로 읽지 않습니다. 배포 환경에는 `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `AT_SERVICE_KEY`를 환경 변수로 전달하고 `prod` 프로필로 실행합니다. `.env.example`은 필요한 변수의 예시이며 실제 인증키와 비밀번호는 Git에 올리지 않습니다.
 
-빌드와 테스트도 같은 DB가 실행 중이어야 합니다.
+```sh
+./gradlew bootRun --args='--spring.profiles.active=prod'
+```
+
+현재 전체 테스트와 빌드에는 개발 DB가 필요합니다.
 
 ```sh
 ./gradlew test
@@ -45,3 +49,9 @@ docker compose up -d postgres
 종료할 때는 `docker compose down`을 실행합니다. 로컬 DB 데이터는 Compose 볼륨에 유지됩니다.
 
 현재는 개발 스키마와 Flyway 마이그레이션 파일이 없습니다. 설계 정책에 따라 Hibernate 자동 DDL과 앱 시작 시 Flyway 실행을 비활성화했습니다. 테이블이 필요한 기능을 추가할 때는 개발 스키마 SQL을 함께 관리해야 합니다.
+
+## aT 정산정보 API 수집
+
+`AT_SERVICE_KEY`에는 공공데이터포털에서 발급받은 실제 인증키를 입력합니다. `.env.example`의 설명용 값으로는 API를 호출할 수 없습니다. aT API 주소, 페이지 크기와 연결·응답 시간 제한은 `src/main/resources/application.yaml`에서 설정합니다.
+
+`AtCollector`는 정산일자 하루, 시장 코드, 품목 대·중분류 코드와 페이지 번호를 받아 한 페이지를 수집합니다. 결과에는 원본 응답, 이번 페이지의 항목 수와 다음 페이지 요청 조건이 담깁니다. HTTP 오류, 제공기관 오류와 잘못된 응답은 구분해 전달합니다. 원본 응답을 저장하고 Request 상태를 갱신하는 모듈은 별도 작업입니다.

@@ -1,17 +1,23 @@
 spring:
   application:
     name: today-fish-backend
-  config:
-    import: file:.env[.properties]
+
   profiles:
     default: local
+
   jpa:
     hibernate:
       ddl-auto: none
+    open-in-view: false
+
   flyway:
     enabled: false
 
-  docker:
-    compose:
-      enabled: false
-
+# 공공데이터 API 설정
+collection:
+  at:
+    end-point: https://apis.data.go.kr/B552845/katSale/trades
+    service-key: ${AT_SERVICE_KEY}
+    page-size: 1000
+    connect-timeout: 3s
+    read-timeout: 10s
