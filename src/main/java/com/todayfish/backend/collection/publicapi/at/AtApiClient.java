@@ -67,9 +67,9 @@ public class AtApiClient {
 
         return restClient.get()
                 .uri(urlBuilder -> {
-                    urlBuilder.queryParam("serviceKey", atApiProperties.serviceKey());
+                    urlBuilder.queryParam("serviceKey", "{serviceKey}");
                     parameters.forEach((key, value) -> urlBuilder.queryParam(key, value));
-                    return urlBuilder.build();
+                    return urlBuilder.build(Map.of("serviceKey", atApiProperties.serviceKey()));
                 })
                 .exchange((request, response) -> {
                     byte[] body = response.getBody().readNBytes(MAX_RESPONSE_BYTE + 1);
